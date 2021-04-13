@@ -21,10 +21,29 @@ const Profile = {
 
         update(req, res) {
             // req.body para pegar os dados
-            // definir quantas semamans tem num ano
-            // remover as samanas de férias do ano
-            // quantas hora por semana estou trabalhando 
+            const data = req.body
+
+            // definir quantas semamans tem num ano: 52
+            const weekPerYear = 52
+
+            // remover as samanas de férias do ano, para pegar quantas semanas tem em 1 mês
+            const weeksPerMonth = (weeksPerYear - data["vacation-per-year"] ) / 12
+
+             // quantas hora por semana estou trabalhando 
+            const weekTotalHours = data["hour-per-day"] * data["days-per-week"]
+
             // total de horas tabalhadas no mês
+            const monthlyTotalHours = weekTotalHours = weekTotalHours * weeksPerMonth
+
+            // qual será o valor da minha hora?
+            const valueHour = data["value-hour"] = data["monthly-budget"] / monthlyTotalHours
+
+            Profile.data = {
+                ...Profile.data,
+                ...req.body,
+                "value-hour": valueHour
+            }
+            return req.redirect('/profile')
         }
     }
 }
@@ -35,7 +54,7 @@ const Job = {
             id: 1,
             name: "Pizzaria Guloso",
             "daily-hours": 2,
-            "total-hours": 1,
+            "total-hours": 60,
             create_at: Date.now(),
         },
         {
@@ -105,7 +124,6 @@ const Job = {
 }
 
 routes.get('/', Job.controllers.index)
-
 routes.get('/job', Job.controllers.create)
 routes.post('/job', Job.controllers.save)
 routes.get('/job/edit', (req, res) => res.render(views + "job-edit"))
